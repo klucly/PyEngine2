@@ -4,6 +4,7 @@ from tkinter import IntVar, StringVar, BooleanVar
 from tkinter import HORIZONTAL, VERTICAL, BROWSE, SINGLE, MULTIPLE, EXTENDED, WORD, CHAR, END
 import keyboard
 from tkinter import messagebox
+import math
 
 #=================================#
 #---------PyEngine Alpha----------#
@@ -1654,8 +1655,9 @@ class Sprite(DefaultCanvasObject):
 
 
 class Rectangle(DefaultCanvasObject):
-    def __init__(self, win, mode = "xywh", coords = [10, 10, 50, 70], bg = "#ffffff", border = 0, outline = "#000000"):
+    def __init__(self, win, mode = "xywh", coords = [10, 10, 50, 70], bg = "#ffffff", border = 0, outline = "#000000", angle = 0):
         self.mode = mode
+        self.angle = angle
         self.coords = coords
         self.bg = bg
         self.border = border
@@ -1672,6 +1674,20 @@ class Rectangle(DefaultCanvasObject):
         if self not in win.__objectList__:
             win.__objectList__.append(self)
         self.__win__ = win
+
+    def rotate(self, points, angle, center):
+        angle = math.radians(angle)
+        cos_val = math.cos(angle)
+        sin_val = math.sin(angle)
+        cx, cy = center
+        new_points = []
+        for x_old, y_old in points:
+            x_old -= cx
+            y_old -= cy
+            x_new = x_old * cos_val - y_old * sin_val
+            y_new = x_old * sin_val + y_old * cos_val
+            new_points.append([x_new + cx, y_new + cy])
+        return new_points
 
 
 
