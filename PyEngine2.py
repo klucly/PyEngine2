@@ -3,6 +3,7 @@ from tkinter import DISABLED, ACTIVE, NORMAL, LEFT, CENTER, RIGHT, SUNKEN, RAISE
 from tkinter import IntVar, StringVar, BooleanVar
 from tkinter import HORIZONTAL, VERTICAL, BROWSE, SINGLE, MULTIPLE, EXTENDED, WORD, CHAR, END
 import keyboard
+from tkinter import messagebox
 
 #=================================#
 #---------PyEngine Alpha----------#
@@ -11,6 +12,7 @@ import keyboard
 
 class DEFAULT():
     def __init__(self): pass
+
 
 class OnClickDefaultWindowClass():
 
@@ -166,6 +168,7 @@ class DefaultWindowObject(OnClickDefaultWindowClass):
 
         if vector == "y":
             self.set_position({1 : self.coords[1]+step})
+
 
 def TEST():
     print("works")
@@ -743,6 +746,7 @@ class Scale(DefaultWindowObject):
     def __init__(self, win, 
                 mode = "px",
                 coords = [100, 100], 
+                notnumber = False, 
                 color = DEFAULT, 
                 on_move = DEFAULT, 
                 activecolor = DEFAULT, 
@@ -767,6 +771,7 @@ class Scale(DefaultWindowObject):
 
         self.__window__ = win
         self.coords = coords
+        self.notnumber = notnumber
         self.color = color
         self.on_move = on_move
         self.activecolor = activecolor
@@ -790,13 +795,17 @@ class Scale(DefaultWindowObject):
         self.variable = variable
         self.width = width
 
-        self.__object__ = BaseLibrary.Scale(self.__window__.__window__)
+        if notnumber:
+            self.__object__ = BaseLibrary.Scrollbar(self.__window__.__window__)
+        else:
+            self.__object__ = BaseLibrary.Scale(self.__window__.__window__)
 
-        self.value_change(self.__window__.__window__, self.mode, self.coords, self.color, self.on_move, self.activecolor, self.digits, self.font, self.border, self.highlightcolor, self.length, self.orient, self.bordertype, self.repeatdelay, self.resolution, self.showvalue, self.sliderlength, self.active, self.takefocus, self.tickinterval, self.to, self.troughcolor, self.variable, self.width)
+        self.value_change(self.__window__.__window__, self.mode, self.coords, self.notnumber, self.color, self.on_move, self.activecolor, self.digits, self.font, self.border, self.highlightcolor, self.length, self.orient, self.bordertype, self.repeatdelay, self.resolution, self.showvalue, self.sliderlength, self.active, self.takefocus, self.tickinterval, self.to, self.troughcolor, self.variable, self.width)
 
     def value_change(self, win = DEFAULT, 
                 mode = DEFAULT,
                 coords = DEFAULT, 
+                notnumber = DEFAULT,
                 color = DEFAULT, 
                 on_move = DEFAULT, 
                 activecolor = DEFAULT, 
@@ -822,22 +831,25 @@ class Scale(DefaultWindowObject):
         if coords != DEFAULT:
             self.coords = coords
 
+        if notnumber != DEFAULT:
+            self.notnumber = notnumber
+
         if mode != DEFAULT:
             self.mode = mode
 
         if on_move != DEFAULT:
             self.__object__["command"] = on_move
 
-        if digits != DEFAULT:
+        if digits != DEFAULT and not notnumber:
             self.__object__["digits"] = digits
 
-        if font != DEFAULT:
+        if font != DEFAULT and not notnumber:
             self.__object__["font"] = font
 
         if border != DEFAULT:
             self.__object__["bd"] = border
 
-        if length != DEFAULT:
+        if length != DEFAULT and not notnumber:
             self.__object__["length"] = length
 
         if orient != DEFAULT:
@@ -849,13 +861,13 @@ class Scale(DefaultWindowObject):
         if repeatdelay != DEFAULT:
             self.__object__["repeatdelay"] = repeatdelay
 
-        if resolution != DEFAULT:
+        if resolution != DEFAULT and not notnumber:
             self.__object__["resolution"] = resolution
 
-        if showvalue != DEFAULT:
+        if showvalue != DEFAULT and not notnumber:
             self.__object__["showvalue"] = showvalue
 
-        if sliderlength != DEFAULT:
+        if sliderlength != DEFAULT and not notnumber:
             self.__object__["sliderlength"] = sliderlength
 
         if active != DEFAULT:
@@ -864,10 +876,10 @@ class Scale(DefaultWindowObject):
         if takefocus != DEFAULT:
             self.__object__["takefocus"] = takefocus
 
-        if tickinterval != DEFAULT:
+        if tickinterval != DEFAULT and not notnumber:
             self.__object__["tickinterval"] = tickinterval
 
-        if to != DEFAULT:
+        if to != DEFAULT and not notnumber:
             self.__object__["to"] = to
 
         if troughcolor != DEFAULT:
@@ -1105,6 +1117,7 @@ class Frame(DefaultWindowObject):
     def __init__(self, win, 
                 mode = "px", 
                 coords = [100, 100], 
+                visibility = False,
                 color = DEFAULT, 
                 border = DEFAULT, 
                 bordertype = DEFAULT, 
@@ -1118,6 +1131,7 @@ class Frame(DefaultWindowObject):
 
         self.__window1__ = win
         self.mode = mode
+        self.visibility = visibility
         self.coords = coords
         self.color = color
         self.border = border
@@ -1130,14 +1144,18 @@ class Frame(DefaultWindowObject):
         self.highlightthickness = highlightthickness
         self.text = text
 
-        self.__object__ = BaseLibrary.LabelFrame(self.__window1__.__window__)
+        if self.visibility:
+            self.__object__ = BaseLibrary.LabelFrame(self.__window1__.__window__)
+        else:
+            self.__object__ = BaseLibrary.Frame(self.__window1__.__window__)
         self.__window__ = self.__object__
 
-        self.value_change(self.__window__, mode, coords, color, border, bordertype, font, width, height, labelAnchor, highlightcolor, highlightthickness, text)
+        self.value_change(self.__window__, mode, coords, visibility, color, border, bordertype, font, width, height, labelAnchor, highlightcolor, highlightthickness, text)
 
     def value_change(self, win = DEFAULT, 
                 mode = DEFAULT, 
                 coords = DEFAULT, 
+                visibility = DEFAULT,
                 color = DEFAULT, 
                 border = DEFAULT, 
                 bordertype = DEFAULT, 
@@ -1155,13 +1173,16 @@ class Frame(DefaultWindowObject):
         if coords != DEFAULT:
             self.coords = coords
 
+        if visibility != DEFAULT:
+            self.visibility = visibility
+
         if border != DEFAULT:
             self.__object__["bd"] = border
 
         if bordertype != DEFAULT:
             self.__object__["relief"] = bordertype
 
-        if font != DEFAULT:
+        if font != DEFAULT and self.visibility:
             self.__object__["font"] = font
 
         if width != DEFAULT:
@@ -1170,13 +1191,13 @@ class Frame(DefaultWindowObject):
         if height != DEFAULT:
             self.__object__["height"] = height
 
-        if labelAnchor != DEFAULT:
+        if labelAnchor != DEFAULT and self.visibility:
             self.__object__["labelAnchor"] = labelAnchor
 
         if highlightthickness != DEFAULT:
             self.__object__["highlightthickness"] = highlightthickness
 
-        if text != DEFAULT:
+        if text != DEFAULT and self.visibility:
             self.__object__["text"] = text
 
         if color != DEFAULT:
@@ -1576,6 +1597,31 @@ class Menu():
     def __classinfo__(self):
         return "DefaultWindowObject"
 
+
+
+class Message():
+    
+    def info(title, text):
+        return messagebox.showinfo(title, text)
+    
+    def warning(title, text):
+        return messagebox.showwarning(title, text)
+    
+    def error(title, text):
+        return messagebox.showerror(title, text)
+    
+    def question(title, text):
+        return messagebox.askquestion(title, text)
+    
+    def ok_cancel(title, text):
+        return messagebox.askokcancel(title, text)
+    
+    def retry_cancel(title, text):
+        return messagebox.askretrycancel (title, text)
+    
+    def yes_no(title, text):
+        return messagebox.askyesno(title, text)
+    
 
 
 
