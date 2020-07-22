@@ -112,7 +112,9 @@ class DefaultCanvasObject():
         
 
 
-    def value_change(self, mode = DEFAULT, coords = DEFAULT, bg = DEFAULT, border = DEFAULT, outline = DEFAULT):
+    def value_change(self, mode = DEFAULT, coords = DEFAULT, bg = DEFAULT, border = DEFAULT, outline = DEFAULT, angle = DEFAULT):
+        if angle == DEFAULT:
+            angle = self.angle
         if mode == DEFAULT:
             mode = self.mode
         if coords == DEFAULT:
@@ -126,7 +128,7 @@ class DefaultCanvasObject():
         # if angle == None:
         #     angle = self.__angle__
 
-        self.__init__(self.__win__, mode, coords, bg, border, outline)
+        self.__init__(self.__win__, mode, coords, bg, border, outline, angle)
 
     def on_click(self, win, func, button = 1):
 
@@ -1668,11 +1670,20 @@ class Rectangle(DefaultCanvasObject):
         if mode == "xy2":
             self.__coords__ = coords
         elif mode == "xywh":
-            self.__coords__ = [coords[0], coords[1], coords[2]+coords[0], coords[1]+coords[3]]
+            x1 = coords[0]
+            x2 = coords[2]+coords[0]
+            y1 = coords[1]
+            y2 = coords[1]+coords[3]
+            self.__coords__ = [[x2, y1], [x1, y1], [x1, y2], [x2, y2]]
         else:
             raise WrongModeError(f"{self}, use 'xy2' or 'xywh' mode")
         if self not in win.__objectList__:
             win.__objectList__.append(self)
+
+        self.center = [(self.__coords__[1][0]+self.__coords__[3][0])/2, (self.__coords__[1][1]+self.__coords__[3][1])/2]
+
+        self.__coords__ = self.rotate(self.__coords__, self.angle, self.center)
+
         self.__win__ = win
 
     def rotate(self, points, angle, center):
@@ -1922,7 +1933,7 @@ class Window(OnClickDefaultWindowClass):
     def drawObj(self, obj):
         if obj.__classinfo__() == "DefaultCanvasObject":
             if obj.__class__ == Rectangle:
-                obj.__canvas_obj__ =  self.__canvas__.create_rectangle(obj.__coords__, fill = obj.bg, width = obj.border, outline = obj.outline)
+                obj.__canvas_obj__ =  self.__canvas__.create_polygon(obj.__coords__, fill = obj.bg, width = obj.border, outline = obj.outline)
 
             elif obj.__class__ == Oval:
                 obj.__canvas_obj__ = self.__canvas__.create_oval(obj.__coords__, fill = obj.bg, width = obj.border, outline = obj.outline)
