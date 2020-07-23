@@ -1,13 +1,13 @@
 import tkinter as BaseLibrary
 from tkinter import DISABLED, ACTIVE, NORMAL, LEFT, CENTER, RIGHT, SUNKEN, RAISED, GROOVE, RIDGE, FLAT
 from tkinter import IntVar, StringVar, BooleanVar
-from tkinter import HORIZONTAL, VERTICAL, BROWSE, SINGLE, MULTIPLE, EXTENDED, WORD, CHAR, END
+from tkinter import HORIZONTAL, VERTICAL, BROWSE, SINGLE, MULTIPLE, EXTENDED, WORD, CHAR, END, BOTH
 import keyboard
 from tkinter import messagebox
 import math
 
 #=================================#
-#---------PyEngine Alpha----------#
+#---------PyEngine2 Alpha---------#
 #---------creator: klucly---------#
 #=================================#
 
@@ -16,10 +16,7 @@ class DEFAULT():
 
 
 class OnClickDefaultWindowClass():
-
-    def on_click(self, func, button = 1):
-
-        self.__object__.bind(f"<Button-{button}>", func)
+    def on_click(self, func, button = 1):self.__object__.bind(f"<Button-{button}>", func)
 
 
 def addPhysics(obj, gravity = 9.8, warnings_pass = False):
@@ -60,11 +57,11 @@ def collision(obj1, obj2):
 
 class DefaultCanvasObject():
 
-    def __classinfo__(self):
-        return "DefaultCanvasObject"
+    def __classinfo__(self): return "DefaultCanvasObject"
             
     def move(self, step, vector = "x"):
         if self.__class__ in modeclasses:
+
             if vector == "y":
 
                 if self.mode == "xywh":
@@ -100,7 +97,6 @@ class DefaultCanvasObject():
             self.value_change(coords = outcoords)
 
     def set_position(self, coords):
-        global modeclasses
 
         outcoords = self.coords
 
@@ -110,9 +106,8 @@ class DefaultCanvasObject():
             
         self.value_change(coords = outcoords)
         
-
-
     def value_change(self, mode = DEFAULT, coords = DEFAULT, bg = DEFAULT, border = DEFAULT, outline = DEFAULT, angle = DEFAULT):
+
         if angle == DEFAULT:
             angle = self.angle
         if mode == DEFAULT:
@@ -125,14 +120,10 @@ class DefaultCanvasObject():
             border = self.border
         if outline == DEFAULT:
             outline = self.outline
-        # if angle == None:
-        #     angle = self.__angle__
 
         self.__init__(self.__win__, mode, coords, bg, border, outline, angle)
 
-    def on_click(self, win, func, button = 1):
-
-        win.__canvas__.tag_bind(self.__canvas_obj__, f"<Button-{button}>", lambda event: func())
+    def on_click(self, win, func, button = 1): win.__canvas__.tag_bind(self.__canvas_obj__, f"<Button-{button}>", lambda event: func())
 
 
 class CantDrawWrongFormatError(Exception):
@@ -145,8 +136,7 @@ class WrongModeError(Exception):
 
 class DefaultWindowObject(OnClickDefaultWindowClass):
 
-    def __classinfo__(self):
-        return "DefaultWindowObject"
+    def __classinfo__(self): return "DefaultWindowObject"
 
     def set_position(self, coords):
         outcoords = self.coords
@@ -173,8 +163,17 @@ class DefaultWindowObject(OnClickDefaultWindowClass):
             self.set_position({1 : self.coords[1]+step})
 
 
-def TEST():
-    print("works")
+class Just(DefaultWindowObject):
+    def __init__(self, obj, mode = DEFAULT, coords = DEFAULT):
+        self.__window__ = obj
+        self.__object__ = obj
+        if mode != DEFAULT:
+            self.mode = mode
+        if coords != DEFAULT:
+            self.coords = coords
+
+    def __classinfo__(self):
+        return "DefaultWindowObject"
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -280,8 +279,7 @@ class Button(DefaultWindowObject):
             if "fg" in activecolor:
                 self.__object__["activeforeground"] = activecolor["fg"]
 
-    def flash(self):
-        self.__object__.flash()
+    def flash(self): self.__object__.flash()
 
 
 
@@ -331,8 +329,12 @@ class Label(DefaultWindowObject):
         
         if coords != DEFAULT:
             self.coords = coords
+
         if height != DEFAULT:
             self.__object__["height"] = height
+            
+        if text != DEFAULT:
+            self.__object__["text"] = text
         
         if width != DEFAULT:
             self.__object__["width"] = width
@@ -437,8 +439,7 @@ class Entry(DefaultWindowObject):
             if FG in selectcolor:
                 self.__object__["selectforeground"] = selectcolor[FG]
 
-    def get(self):
-        return self.__object__.get()
+    def get(self): return self.__object__.get()
 
 
 
@@ -580,17 +581,13 @@ class RadioButton(DefaultWindowObject):
         if selectcolor != DEFAULT:
             self.__object__["selectcolor"] = selectcolor
 
-    def deselect(self):
-        self.__object__.deselect()
+    def deselect(self): self.__object__.deselect()
 
-    def select(self):
-        self.__object__.select()
+    def select(self): self.__object__.select()
 
-    def flash(self):
-        self.__object__.flash()
+    def flash(self): self.__object__.flash()
 
-    def invoke(self):
-        self.__object__.invoke()
+    def invoke(self): self.__object__.invoke()
 
 
 
@@ -727,20 +724,15 @@ class CheckButton(DefaultWindowObject):
         if selectcolor != DEFAULT:
             self.__object__["selectcolor"] = selectcolor
 
-    def deselect(self):
-        self.__object__.deselect()
+    def deselect(self): self.__object__.deselect()
 
-    def select(self):
-        self.__object__.select()
+    def select(self): self.__object__.select()
 
-    def flash(self):
-        self.__object__.flash()
+    def flash(self): self.__object__.flash()
 
-    def invoke(self):
-        self.__object__.invoke()
+    def invoke(self): self.__object__.invoke()
 
-    def toggle(self):
-        self.__object__.toggle()
+    def toggle(self): self.__object__.toggle()
 
 
 
@@ -915,11 +907,9 @@ class Scale(DefaultWindowObject):
             if FG in color:
                 self.__object__["highlightcolor"] = highlightcolor[FG]
         
-    def set(self, value):
-        self.__object__.set(value)
+    def set(self, value): self.__object__.set(value)
 
-    def get(self):
-        return self.__object__.get()
+    def get(self): return self.__object__.get()
         
 
 
@@ -1077,41 +1067,29 @@ class Text(DefaultWindowObject):
             if FG in selectcolor:
                 self.__object__["selectcolor"] = selectcolor[FG]
         
-    def delete(self, startindex, endindex):
-        self.__object__.delete(startindex, endindex)
+    def delete(self, startindex, endindex): return self.__object__.delete(startindex, endindex)
 
-    def get(self, startindex, endindex):
-        return self.__object__.get(startindex, endindex)
+    def get(self, startindex, endindex): return self.__object__.get(startindex, endindex)
 
-    def index(self, index):
-        return self.__object__.index(index)
+    def index(self, index): return self.__object__.index(index)
 
-    def insert(self, index, chars):
-        self.__object__.insert(index, chars)
+    def insert(self, index, chars): return self.__object__.insert(index, chars)
 
-    def see(self, index):
-        return self.__object__.see(index)
+    def see(self, index): return self.__object__.see(index)
 
-    def mark_gravity(self, mark):
-        return self.__object__.mark_gravity(mark)
+    def mark_gravity(self, mark): return self.__object__.mark_gravity(mark)
 
-    def mark_names(self):
-        return self.__object__.mark_names()
+    def mark_names(self): return self.__object__.mark_names()
 
-    def mark_set(self, mark, index):
-        return self.__object__.mark_set(mark, index)
+    def mark_set(self, mark, index): return self.__object__.mark_set(mark, index)
 
-    def mark_unset(self, marks):
-        return self.__object__.mark_unset(marks)
+    def mark_unset(self, marks): return self.__object__.mark_unset(marks)
 
-    def tag_add(self, tagname, startindex, endindex):
-        return self.__object__.tag_add(tagname, startindex, endindex)
+    def tag_add(self, tagname, startindex, endindex): return self.__object__.tag_add(tagname, startindex, endindex)
 
-    def tag_delete(self, tag):
-        return self.__object__.tag_delete(tag)
+    def tag_delete(self, tag): return self.__object__.tag_delete(tag)
 
-    def tag_remove(self, tag, startindex, endindex):
-        return self.__object__.tag_remove(tag, startindex, endindex)
+    def tag_remove(self, tag, startindex, endindex): return self.__object__.tag_remove(tag, startindex, endindex)
 
 
 
@@ -1597,34 +1575,121 @@ class Menu():
     def show(self, x, y):
         self.__object__.post(x, y)
 
-    def __classinfo__(self):
-        return "DefaultWindowObject"
+    def __classinfo__(self): return "DefaultWindowObject"
 
 
 
 class Message():
     
-    def info(title, text):
-        return messagebox.showinfo(title, text)
+    def info(title, text): return messagebox.showinfo(title, text)
     
-    def warning(title, text):
-        return messagebox.showwarning(title, text)
+    def warning(title, text): return messagebox.showwarning(title, text)
     
-    def error(title, text):
-        return messagebox.showerror(title, text)
+    def error(title, text): return messagebox.showerror(title, text)
     
-    def question(title, text):
-        return messagebox.askquestion(title, text)
+    def question(title, text): return messagebox.askquestion(title, text)
     
-    def ok_cancel(title, text):
-        return messagebox.askokcancel(title, text)
+    def ok_cancel(title, text): return messagebox.askokcancel(title, text)
     
-    def retry_cancel(title, text):
-        return messagebox.askretrycancel (title, text)
+    def retry_cancel(title, text): return messagebox.askretrycancel (title, text)
     
-    def yes_no(title, text):
-        return messagebox.askyesno(title, text)
+    def yes_no(title, text): return messagebox.askyesno(title, text)
     
+
+
+class PanedWindow(DefaultWindowObject):
+
+    def __init__(self, win, 
+                mode = "px", 
+                coords = [0, 0], 
+                color = DEFAULT, 
+                border = DEFAULT, 
+                bordertype = DEFAULT, 
+                borderwidth = DEFAULT, 
+                handlepad = DEFAULT, 
+                handlesize = DEFAULT, 
+                width = DEFAULT, 
+                height = DEFAULT, 
+                orient = DEFAULT, 
+                showhandle = DEFAULT):
+
+        self.__window1__ = win
+        self.mode = mode
+        self.coords = coords
+        self.color = color
+        self.border = border
+        self.bordertype = bordertype
+        self.borderwidth = borderwidth
+        self.handlepad = handlepad
+        self.handlesize = handlesize
+        self.width = width
+        self.height = height
+        self.orient = orient
+        self.showhandle = showhandle
+
+        self.__object__ = BaseLibrary.PanedWindow(self.__window1__.__window__)
+        self.__window__ = self.__object__
+
+        self.value_change(self.__window1__, mode, coords, color, border, bordertype, borderwidth, handlepad, handlesize, width, height, orient, showhandle)
+
+    def value_change(self, win = DEFAULT, 
+                mode = DEFAULT, 
+                coords = DEFAULT, 
+                color = DEFAULT, 
+                border = DEFAULT, 
+                bordertype = DEFAULT, 
+                borderwidth = DEFAULT, 
+                handlepad = DEFAULT, 
+                handlesize = DEFAULT, 
+                width = DEFAULT, 
+                height = DEFAULT, 
+                orient = DEFAULT, 
+                showhandle = DEFAULT):
+
+        if mode != DEFAULT:
+            self.mode = mode
+
+        if coords != DEFAULT:
+            self.coords = coords
+
+        if border != DEFAULT:
+            self.__object__["bd"] = border
+
+        if bordertype != DEFAULT:
+            self.__object__["relief"] = bordertype
+
+        if borderwidth != DEFAULT:
+            self.__object__["borderwidth"] = borderwidth
+
+        if handlepad != DEFAULT:
+            self.__object__["handlepad"] = handlepad
+
+        if handlesize != DEFAULT:
+            self.__object__["handlesize"] = handlesize
+
+        if width != DEFAULT:
+            self.__object__["width"] = width
+
+        if height != DEFAULT:
+            self.__object__["height"] = height
+
+        if orient != DEFAULT:
+            self.__object__["orient"] = orient
+
+        if showhandle != DEFAULT:
+            self.__object__["showhandle"] = showhandle
+
+        if color != DEFAULT:
+            
+            if BG in color:
+                self.__object__[BG] = color[BG]
+            
+            if FG in color:
+                self.__object__[FG] = color[FG]
+
+    def add(self, child, **kw):
+        self.__object__.add(child.__object__, **kw)
+
 
 
 
@@ -1657,6 +1722,7 @@ class Sprite(DefaultCanvasObject):
 
 
 class Rectangle(DefaultCanvasObject):
+
     def __init__(self, win, mode = "xywh", coords = [10, 10, 50, 70], bg = "#ffffff", border = 0, outline = "#000000", angle = 0):
         self.mode = mode
         self.angle = angle
@@ -1664,7 +1730,7 @@ class Rectangle(DefaultCanvasObject):
         self.bg = bg
         self.border = border
         self.outline = outline
-        self.__coords__ = [0, 0, 0, 0]
+        self.__coords__ = [[0, 0], [0, 0], [0, 0], [0, 0]]
         self.__canvas__ = BaseLibrary.Canvas()
 
         if mode == "xy2":
@@ -1913,8 +1979,7 @@ class Window(OnClickDefaultWindowClass):
 
         self.__canvas__ = BaseLibrary.Canvas(bg = bg)
 
-    def clear(self):
-        self.__canvas__.delete("all")
+    def clear(self): self.__canvas__.delete("all")
 
     def end(self):
         self.__canvas__.place(x = 0, y = 0, relwidth = 1, relheight = 1)
@@ -1976,22 +2041,19 @@ class Window(OnClickDefaultWindowClass):
         else:
             raise CantDrawWrongFormatError(obj)
 
-    def wait(self, time, func):
-        self.__window__.after(time, func)
+    def wait(self, time, func): self.__window__.after(time, func)
 
     def key_game(self, key, func):
         if self.__window__.focus_get() != None and keyboard.is_pressed(key):
             func()
 
-    def key_text(self, key, func):
-        self.__window__.bind(key, func)
+    def key_text(self, key, func): self.__window__.bind(key, func)
 
     def cameraMove(self, step, vector):
         # WIP
         self.__camera__.move(step, vector, self.__objectList__)
 
-    def set_camera_position(self, position):
-        self.__camera__.set_position(position, self.__objectList__)
+    def set_camera_position(self, position): self.__camera__.set_position(position, self.__objectList__)
 
 class __Camera__():
     # Work in progress
@@ -2032,7 +2094,118 @@ class __Camera__():
             
             obj.set_position(out)
         self.coords = position
+            
+
+class MiniWindow(Frame):
+    def __init__(self, win, 
+                mode = "px", 
+                coords = [100, 100], 
+                visibility = False,
+                color = DEFAULT, 
+                border = DEFAULT, 
+                bordertype = DEFAULT, 
+                font = DEFAULT, 
+                width = DEFAULT, 
+                height = DEFAULT, 
+                labelAnchor = DEFAULT, 
+                highlightcolor = DEFAULT, 
+                highlightthickness = DEFAULT, 
+                text = DEFAULT):
                 
+        self.__window1__ = win
+        self.mode = mode
+        self.visibility = visibility
+        self.coords = coords
+        self.color = color
+        self.border = border
+        self.bordertype = bordertype
+        self.font = font
+        self.width = width
+        self.height = height
+        self.labelAnchor = labelAnchor
+        self.highlightcolor = highlightcolor
+        self.highlightthickness = highlightthickness
+        self.text = text
+        self.__objectList__ = []
+
+        if self.visibility:
+            self.__object__ = BaseLibrary.LabelFrame(self.__window1__.__window__)
+        else:
+            self.__object__ = BaseLibrary.Frame(self.__window1__.__window__)
+        self.__window__ = self.__object__
+        self.__canvas__ = BaseLibrary.Canvas(self.__window__)
+        self.__canvas__.place(x = 0, y = 0, relwidth = 1, relheight = 1)
+
+        self.value_change(self.__window__, mode, coords, visibility, color, border, bordertype, font, width, height, labelAnchor, highlightcolor, highlightthickness, text)
+
+    def clear(self):
+        self.__canvas__.delete("all")
+
+    def drawObj(self, obj):
+        if obj.__classinfo__() == "DefaultCanvasObject":
+            if obj.__class__ == Rectangle:
+                obj.__canvas_obj__ =  self.__canvas__.create_polygon(obj.__coords__, fill = obj.bg, width = obj.border, outline = obj.outline)
+
+            elif obj.__class__ == Oval:
+                obj.__canvas_obj__ = self.__canvas__.create_oval(obj.__coords__, fill = obj.bg, width = obj.border, outline = obj.outline)
+
+            elif obj.__class__ == Line:
+                obj.__canvas_obj__ = self.__canvas__.create_line(obj.__coords__, width = obj.border, fill = obj.color)
+
+            elif obj.__class__ == OvalSector:
+                obj.__canvas_obj__ = self.__canvas__.create_arc(obj.__coords__, start = obj.start_angle, extent = obj.angle, fill = obj.bg, width = obj.border, outline = obj.outline)
+
+            elif obj.__class__ == OvalSegment:
+                obj.__canvas_obj__ = self.__canvas__.create_arc(obj.__coords__, style = BaseLibrary.CHORD, start = obj.start_angle, extent = obj.angle, fill = obj.bg, width = obj.border, outline = obj.outline)
+
+            elif obj.__class__ == Arc:
+                obj.__canvas_obj__ = self.__canvas__.create_arc(obj.__coords__, style = BaseLibrary.ARC, start = obj.start_angle, extent = obj.angle, outline = obj.color, width = obj.border)
+
+            elif obj.__class__ == Polygon:
+                obj.__canvas_obj__ = self.__canvas__.create_polygon(obj.__coords__, fill = obj.bg, width = obj.border, outline = obj.outline)
+
+            elif obj.__class__ == Sprite:
+                obj.__canvas_obj__ = self.__canvas__.create_image(obj.__coords__[0], obj.__coords__[1], image = obj.__image__)
+
+        elif obj.__classinfo__() == "DefaultWindowObject":
+
+            if obj.__class__ == Menu:
+                self.__window__.config(menu = obj.__object__)
+
+            elif obj.coords.__len__() == 2:
+                if obj.mode == "px":
+                    obj.__object__.place(x = obj.coords[0], y = obj.coords[1])
+                elif obj.mode == "%":
+                    obj.__object__.place(relx = obj.coords[0], rely = obj.coords[1])
+
+            elif obj.coords.__len__() == 4:
+                if obj.mode == "px":
+                    obj.__object__.place(x = obj.coords[0], y = obj.coords[1], width = obj.coords[2], height = obj.coords[3])
+                elif obj.mode == "%":
+                    obj.__object__.place(relx = obj.coords[0], rely = obj.coords[1], relwidth = obj.coords[2], relheight = obj.coords[3])
+
+        else:
+            raise CantDrawWrongFormatError(obj)
+
+class Toplevel(Window):
+    def __init__(self, win, title = "New freaking window", winsize = "200x200+100+100", bg = "#ffffff", resizable = [True, True]):
+        self.__objectList__ = []
+        self.bg = bg
+        self.resizable = resizable
+        self.winsize = winsize
+        self.title = title
+        self.__window1__ = win
+        self.__window__ = BaseLibrary.Toplevel(self.__window1__.__window__)
+        self.__window__.config(bg = bg)
+        self.__window__.title(title)
+        self.__window__.geometry(winsize)
+        self.__window__.resizable(resizable[0], resizable[1])
+        self.__camera__ = __Camera__([0, 0], winsize)
+        self.__object__ = self.__window__
+
+
+        self.__canvas__ = BaseLibrary.Canvas(bg = bg)
+    
 #-------------------------------------------------------------------------------------------------------------------------------------------------------
 
 physicsRecommendedClasses = [Rectangle, Oval, Polygon, OvalSegment, OvalSector, Arc, Line]
