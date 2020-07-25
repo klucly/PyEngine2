@@ -5,6 +5,10 @@ from tkinter import HORIZONTAL, VERTICAL, BROWSE, SINGLE, MULTIPLE, EXTENDED, WO
 import keyboard
 from tkinter import messagebox
 import math
+import pymunk as basephysicsengine
+DYNAMIC = basephysicsengine.Body.DYNAMIC
+KINEMATIC = basephysicsengine.Body.KINEMATIC
+STATIC = basephysicsengine.Body.STATIC
 
 #=================================#
 #---------PyEngine2 Alpha---------#
@@ -19,40 +23,111 @@ class OnClickDefaultWindowClass():
     def on_click(self, func, button = 1):self.__object__.bind(f"<Button-{button}>", func)
 
 
-def addPhysics(obj, gravity = 9.8, warnings_pass = False):
+class Physics():
 
-    if not(warnings_pass):
-        if obj.__class__ not in physicsRecommendedClasses:
-            print(f"Not recommended to use physics to {obj.__class__}")
+    def __init__(self, gravity = [0, 1000], fps = 60):
+
+        self.__space__ = basephysicsengine.Space()
+        self.__space__.gravity = gravity
+        self.__objectList__ = []
+        self.fps = fps
+
+    class RectRigitBody():
+
+        def __init__(self, space, obj, body_type = DYNAMIC, mass = 1, elasticity = .9):
+
+            self.__sprite__ = obj
+            self.coords = self.__sprite__.coords[0], self.__sprite__.coords[1]
+            self.body_type = body_type
+            self.__sprite__.RigitBody = self
+            self.width = self.__sprite__.coords[2]
+            self.height = self.__sprite__.coords[3]
+            self.angle = 0
+            self.mass = mass
+            self.moment = basephysicsengine.moment_for_box(self.mass, [self.width, self.height])
+            self.elasticity = elasticity
+
+            self.body = basephysicsengine.Body(self.mass, self.moment, self.body_type)
+            self.body.position = self.coords
+            self.body.angle = math.radians(self.angle)
+
+            self.poly = basephysicsengine.Poly.create_box(self.body, (self.width, self.height))
+            self.poly.elasticity = self.elasticity
+            self.space = space
+            self.space.__objectList__.append(self)
+
+            self.space.__space__.add(self.body, self.poly)
+
+    class CircleRigitBody():
+
+        def __init__(self, space, obj, body_type = DYNAMIC, mass = 1, elasticity = .9):
+
+            self.__sprite__ = obj
+            self.coords = self.__sprite__.coords
+            self.body_type = body_type
+            self.__sprite__.RigitBody = self
+            self.radius = self.__sprite__.radius
+            self.angle = 0
+            self.mass = mass
+            self.moment = basephysicsengine.moment_for_circle(self.mass, 0, self.radius)
+            self.elasticity = elasticity
+
+            self.body = basephysicsengine.Body(self.mass, self.moment, self.body_type)
+            self.body.position = self.coords
+            self.body.angle = math.radians(self.angle)
+
+            self.poly = basephysicsengine.Circle(self.body, self.radius)
+            self.poly.elasticity = self.elasticity
+            self.space = space
+            self.space.__objectList__.append(self)
+
+            self.space.__space__.add(self.body, self.poly)
+
+    class SegmentRigitBody():
+
+        def __init__(self, space, obj, body_type = DYNAMIC, mass = 1, elasticity = .9):
+
+            self.__sprite__ = obj
+            # self.coords1 = [self.__sprite__.coords[0], self.__sprite__.coords[1]], [self.__sprite__.coords[2], self.__sprite__.coords[3]]
+            self.coords = self.__sprite__.coords
+            self.body_type = body_type
+            self.__sprite__.RigitBody = self
+            self.radius = self.__sprite__.border
+            self.angle = 0
+            self.mass = mass
+            self.moment = basephysicsengine.moment_for_circle(self.mass, 0, self.radius)
+            self.elasticity = elasticity
+
+            self.body = basephysicsengine.Body(self.mass, self.moment, self.body_type)
+            self.body.position = 0, 0
+            self.body.angle = math.radians(self.angle)
+
+            self.poly = basephysicsengine.Segment(self.body, [self.coords[0], self.coords[1]], [self.coords[2], self.coords[3]], self.radius)
+            self.poly.elasticity = self.elasticity
+            self.space = space
+            self.space.__objectList__.append(self)
+
+            self.space.__space__.add(self.body, self.poly)
 
 
-    class Physics():
+    def updatePhysics(self):
+        
+        for obj in self.__objectList__:
+            obj.coords = obj.body.position
+            obj.angle = obj.body.angle
 
-        def __init__(self, gravity = 9.8):
-            self.fallTime = 1
-            self.gravity = gravity
-            self.verticalSpeed = 1.
+            if obj.__class__ == self.RectRigitBody:
+                obj.__sprite__.set_position({0:obj.coords[0], 1:obj.coords[1]})
+                obj.__sprite__.value_change(angle = math.degrees(obj.angle))
 
-        def update(self):
-            self.verticalSpeed = self.verticalSpeed + self.gravity * self.fallTime /10000
-            self.fallTime += 1
+            elif obj.__class__ == self.CircleRigitBody:
+                obj.__sprite__.set_position([obj.coords[0], obj.coords[1]])
 
-    obj.physics = Physics(gravity)
-            
+            elif obj.__class__ == self.SegmentRigitBody:
+                obj.__sprite__.set_position(obj.coords)
+                
 
-def collision(obj1, obj2):
-    classes = [Rectangle, Oval]
-    if obj1.__class__ in classes and obj2.__class__ in classes:
-
-        if (obj1.__coords__[0] < obj2.__coords__[2] and
-            obj1.__coords__[1] < obj2.__coords__[3] and 
-
-            obj1.__coords__[2] > obj2.__coords__[0] and 
-            obj1.__coords__[3] > obj2.__coords__[1]):
-
-            return True
-
-    return False
+        self.__space__.step(1/self.fps)
 
 
 class DefaultCanvasObject():
@@ -1907,7 +1982,7 @@ class Line(DefaultCanvasObject):
         if color == DEFAULT:
             color = self.color
 
-        self.__init__(coords, border, color)
+        self.__init__(self.__win__, coords, border, color)
 
 
 
@@ -1930,6 +2005,39 @@ class Oval(DefaultCanvasObject):
             win.__objectList__.append(self)
         self.__win__ = win
 
+
+
+class Circle(DefaultCanvasObject):
+
+    def __init__(self, win, coords = [100, 100], radius = 100, bg = "white", border = 0, outline = "black"):
+
+        self.__coords__ = [coords[0]-radius, coords[1]-radius, coords[0]+radius, coords[1]+radius]
+        self.coords = coords
+        self.radius = radius
+        self.bg = bg
+        self.border = border
+        self.outline = outline
+        self.__win__ = win
+        self.angle = 0
+        if self not in win.__objectList__:
+            win.__objectList__.append(self)
+        
+    def value_change(self, win = DEFAULT, coords = DEFAULT, radius = DEFAULT, bg = DEFAULT, border = DEFAULT, outline = DEFAULT, angle = 0):
+
+        if radius == DEFAULT:
+            radius = self.radius
+        if coords == DEFAULT:
+            coords = self.coords
+        if bg == DEFAULT:
+            bg = self.bg
+        if border == DEFAULT:
+            border = self.border
+        if outline == DEFAULT:
+            outline = self.outline
+
+        self.__init__(self.__win__, coords, radius, bg, border, outline)
+
+    def set_position(self, coords): self.value_change(coords = coords)
 
 
 class Polygon(DefaultCanvasObject):
@@ -2021,6 +2129,9 @@ class Window(OnClickDefaultWindowClass):
             elif obj.__class__ == Sprite:
                 obj.__canvas_obj__ = self.__canvas__.create_image(obj.__coords__[0], obj.__coords__[1], image = obj.__image__)
 
+            elif obj.__class__ == Circle:
+                obj.__canvas_obj__ = self.__canvas__.create_oval(obj.__coords__, fill = obj.bg, width = obj.border, outline = obj.outline)
+
         elif obj.__classinfo__() == "DefaultWindowObject":
 
             if obj.__class__ == Menu:
@@ -2038,8 +2149,7 @@ class Window(OnClickDefaultWindowClass):
                 elif obj.mode == "%":
                     obj.__object__.place(relx = obj.coords[0], rely = obj.coords[1], relwidth = obj.coords[2], relheight = obj.coords[3])
 
-        else:
-            raise CantDrawWrongFormatError(obj)
+        else: raise CantDrawWrongFormatError(obj)
 
     def wait(self, time, func): self.__window__.after(time, func)
 
@@ -2205,7 +2315,7 @@ class Toplevel(Window):
 
 
         self.__canvas__ = BaseLibrary.Canvas(bg = bg)
-    
+
 #-------------------------------------------------------------------------------------------------------------------------------------------------------
 
 physicsRecommendedClasses = [Rectangle, Oval, Polygon, OvalSegment, OvalSector, Arc, Line]
